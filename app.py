@@ -62,6 +62,13 @@ def exportar_excel():
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
+@app.route('/excluir/<int:id>', methods=['GET'])
+def excluir_movimento(id):
+    movimento = MovimentoCaixa.query.get_or_404(id)  # Procura o movimento pelo ID
+    db.session.delete(movimento)  # Exclui o movimento
+    db.session.commit()  # Confirma a exclusão
+    return redirect(url_for('index'))  # Redireciona para a página principal
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
