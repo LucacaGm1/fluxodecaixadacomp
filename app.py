@@ -3,6 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import io
 from openpyxl import Workbook
+import pytz
+
+@app.route('/')
+def index():
+    movimentos = MovimentoCaixa.query.order_by(MovimentoCaixa.horario.desc()).all()
+    fuso_brasil = pytz.timezone('America/Sao_Paulo')
+    for m in movimentos:
+        m.horario = m.horario.astimezone(fuso_brasil)
+    saldo = sum(m.valor if m.tipo == 'entrada' else -m.valor for m in movimentos)
+    return render_template('index.html', movimentos=movimentos, saldo=saldo)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///caixa.db'
